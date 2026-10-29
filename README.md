@@ -1,8 +1,21 @@
 # astro-twin-sites
 
-PoC of twin Astro static sites with mutual headline loading.
+Demo of bilingual twin Astro static sites that share headlines, with search, filtering, and CI/CD deploys to a rental server.
 
-Two bilingual (日本語 / English) sites built from one repository and deployed as plain files to a shared rental server. Each site shows the other's latest news on its home page, read from the other's RSS feed **at build time**, so the published pages never call anything at runtime. All content is fictional except the café guide (see Disclaimer).
+## Features
+
+- **Astro static sites.** Plain HTML/CSS/JS output with no server-side runtime.
+- **Twin sites, mutual headlines.** Each site shows the other's latest news on its home page, read from the other's RSS feed **at build time**.
+- **CI/CD.** GitHub Actions builds both sites and deploys them over SSH to a Sakura rental server.
+- **Atomic releases with rollback.** Each deploy goes to a new release directory, and switching the live release is a single symlink swap.
+- **Full-text search.** [Pagefind](https://pagefind.app/) runs client-side, with separate Japanese and English indexes.
+- **Metadata filtering.** Lists can be narrowed by metadata such as category, origin, process, and roast, combined across facets. The filter state lives in the URL, so a filtered view can be shared as a link.
+- **Bilingual (日本語 / English).** Translations are paired per item. An item that exists only in Japanese is handled cleanly, and each page carries hreflang alternates.
+- **RSS feeds and sitemaps.** Each site has an RSS 2.0 feed per language and a sitemap.
+- **Content from Markdown.** Every news item, café, and bean is a Markdown file with frontmatter, validated by a Zod schema at build time.
+- **Shared code.** npm workspaces hold the two sites and a small shared kit (i18n, translation pairs, the sibling-feed loader).
+
+All content is fictional except the café guide (see Disclaimer).
 
 | Site | URL | What it is |
 |------|-----|------------|
