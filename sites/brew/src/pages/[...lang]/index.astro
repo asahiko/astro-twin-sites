@@ -11,7 +11,7 @@ export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
 const t = UI[lang];
 const news = (await getNews(lang)).slice(0, 5);
-const cafes = (await getCafes(lang)).slice(0, 3);
+const cafes = (await getCafes(lang)).slice(0, 4);
 const lead = {
   ja: "研究学園都市・つくばの喫茶店、自家焙煎店、キャンパスのコーヒーまで。街のコーヒーの話題をゆるく集めるポータルです。",
   en: "From kissaten to roasters to campus coffee bars — a relaxed portal collecting coffee talk from Tsukuba Science City.",
