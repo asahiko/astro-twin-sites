@@ -1,0 +1,36 @@
+---
+import { langPaths, localize, type Lang } from "@twin/kit/i18n";
+import Base from "../../layouts/Base.astro";
+import CafeCards from "../../components/CafeCards.astro";
+import NewsList from "../../components/NewsList.astro";
+import SiblingHeadlines from "../../components/SiblingHeadlines.astro";
+import { getCafes, getNews } from "../../lib/content";
+import { UI } from "../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = UI[lang];
+const news = (await getNews(lang)).slice(0, 5);
+const cafes = (await getCafes(lang)).slice(0, 3);
+const lead = {
+  ja: "研究学園都市・つくばの喫茶店、自家焙煎店、キャンパスのコーヒーまで。街のコーヒーの話題をゆるく集めるポータルです。",
+  en: "From kissaten to roasters to campus coffee bars — a relaxed portal collecting coffee talk from Tsukuba Science City.",
+}[lang];
+---
+<Base lang={lang}>
+  <section class="hero">
+    <h1>{t.siteName}</h1>
+    <p>{lead}</p>
+  </section>
+  <div class="home-grid">
+    <div>
+      <h2>{t.news}</h2>
+      <NewsList lang={lang} items={news} />
+      <p class="section-more"><a href={localize(lang, "/news/")}>{t.more} →</a></p>
+      <h2>{t.cafes}</h2>
+      <CafeCards lang={lang} items={cafes} />
+      <p class="section-more"><a href={localize(lang, "/cafes/")}>{t.more} →</a></p>
+    </div>
+    <SiblingHeadlines lang={lang} />
+  </div>
+</Base>

@@ -1,0 +1,15 @@
+{
+  "name": "@twin/kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.3.0"
+  },
+  "peerDependencies": {
+    "astro": "^7.0.0"
+  }
+}

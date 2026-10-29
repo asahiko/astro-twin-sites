@@ -1,0 +1,41 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../layouts/Base.astro";
+import { UI } from "../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+---
+<Base lang={lang} title={UI[lang].about}>
+  <article class="article">
+    {lang === "ja" ? (
+      <>
+        <h1>BeanDaCs について</h1>
+        <p>BeanDaCs（Bean Data Catalogs）は、コーヒー豆の情報を共通のメタデータで整理し、産地・精製方法・焙煎度・種別で絞り込めるようにした架空のカタログです。掲載している豆と焙煎所はすべて架空のものです。</p>
+        <h2>メタデータ</h2>
+        <ul>
+          <li><strong>種別</strong>：シングルオリジン／ブレンド／デカフェ</li>
+          <li><strong>産地</strong>：地域 › 国 の 2 階層</li>
+          <li><strong>精製方法・焙煎度・販売状況</strong>、スタッフおすすめ、頭文字</li>
+        </ul>
+        <p>絞り込みと並べ替えはすべてブラウザ上で行われ、サーバー側の検索処理はありません。</p>
+        <h2>姉妹サイト</h2>
+        <p>つくばのカフェ情報サイト <a href="https://brew.asahiko.link/">Brew Tsukuba</a> のニュースを、ビルド時に RSS から取り込んでトップページに表示しています。</p>
+      </>
+    ) : (
+      <>
+        <h1>About BeanDaCs</h1>
+        <p>BeanDaCs (Bean Data Catalogs) is a fictional catalog that describes coffee beans with shared metadata so you can filter them by origin, process, roast and type. All beans and roasters listed are made up.</p>
+        <h2>Metadata</h2>
+        <ul>
+          <li><strong>Type</strong>: single origin / blend / decaf</li>
+          <li><strong>Origin</strong>: two levels, region › country</li>
+          <li><strong>Process, roast, availability</strong>, staff picks and initial letter</li>
+        </ul>
+        <p>Filtering and sorting run entirely in the browser; there is no server-side search.</p>
+        <h2>Sister site</h2>
+        <p>The home page shows news from <a href="https://brew.asahiko.link/en/">Brew Tsukuba</a>, a café guide for Tsukuba, read from its RSS feed at build time.</p>
+      </>
+    )}
+  </article>
+</Base>

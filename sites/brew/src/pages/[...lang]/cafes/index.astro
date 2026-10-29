@@ -1,0 +1,22 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import CafeCards from "../../../components/CafeCards.astro";
+import CategoryFilter from "../../../components/CategoryFilter.astro";
+import { getCafes } from "../../../lib/content";
+import { CAFE_CATEGORIES, UI } from "../../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const items = await getCafes(lang);
+const intro = {
+  ja: "つくば市内の実在のカフェを、公開されている情報をもとに紹介します。当サイトは各店舗と関係がありません。営業時間やメニューは各店の公式情報をご確認ください。",
+  en: "Real cafés in Tsukuba, introduced from publicly available information. This site has no affiliation with them. Please check each café's official channels for hours and menus.",
+}[lang];
+---
+<Base lang={lang} title={UI[lang].cafes}>
+  <h1>{UI[lang].cafes}</h1>
+  <p>{intro}</p>
+  <CategoryFilter lang={lang} codes={CAFE_CATEGORIES} target="#cafes" />
+  <div id="cafes"><CafeCards lang={lang} items={items} /></div>
+</Base>

@@ -1,0 +1,55 @@
+---
+import { render } from "astro:content";
+import { formatDate, LANGS, localize, otherLang, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import { getBeans } from "../../../lib/content";
+import { label, regionOf, UI } from "../../../lib/labels";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LANGS) {
+    for (const item of await getBeans(lang)) {
+      paths.push({ params: { lang: lang === "ja" ? undefined : lang, slug: item.data.slug }, props: { lang, item } });
+    }
+  }
+  return paths;
+}
+type Props = { lang: Lang; item: Awaited<ReturnType<typeof getBeans>>[number] };
+const { lang, item } = Astro.props;
+const { data } = item;
+const t = UI[lang];
+const other = otherLang(lang);
+const altPath = item.langs.includes(other) ? localize(other, `/beans/${data.slug}/`) : localize(other, "/find/");
+const find = (q: string) => localize(lang, `/find/?${q}`);
+const { Content } = await render(item.entry);
+---
+<Base lang={lang} title={data.title} description={data.summary} altPath={altPath}>
+  <p class="breadcrumb"><a href={localize(lang, "/")}>{t.home}</a> › <a href={localize(lang, "/find/")}>{t.find}</a></p>
+  <article class="article">
+    <h1>{data.title}</h1>
+    <p class="article-meta">
+      <span class="chip chip-fictional">{t.fictional}</span>
+      <a class="chip chip-type" href={find(`type=${data.type}`)}>{label(data.type, lang)}</a>
+      {data.staffPick && <a class="chip chip-pick" href={find("pick=1")}>★ {t.pick}</a>}
+      <span>{label(data.availability, lang)}</span>
+    </p>
+    <p>{data.summary}</p>
+    <dl class="spec">
+      <dt>{t.origin}</dt>
+      <dd>{data.country.map((c, i) => <>{i > 0 && " / "}<a href={find(`region=${regionOf(c)}`)}>{label(regionOf(c), lang)}</a> › <a href={find(`country=${c}`)}>{label(c, lang)}</a></>)}</dd>
+      <dt>{t.process}</dt>
+      <dd>{data.process.map((p, i) => <>{i > 0 && ", "}<a href={find(`process=${p}`)}>{label(p, lang)}</a></>)}</dd>
+      <dt>{t.roast}</dt>
+      <dd><a href={find(`roast=${data.roast}`)}>{label(data.roast, lang)}</a></dd>
+      {data.varietal && <><dt>{t.varietal}</dt><dd>{data.varietal}</dd></>}
+      {data.altitude && <><dt>{t.altitude}</dt><dd>{data.altitude}</dd></>}
+      {data.flavor && <><dt>{t.flavor}</dt><dd>{data.flavor.join(" · ")}</dd></>}
+      {data.roaster && <><dt>{t.roaster}</dt><dd>{data.roaster}</dd></>}
+      <dt>{t.added}</dt>
+      <dd>{formatDate(data.addedAt, lang)}</dd>
+      {data.updatedAt && <><dt>{t.updated}</dt><dd>{formatDate(data.updatedAt, lang)}</dd></>}
+    </dl>
+    <Content />
+  </article>
+  <p><a href={localize(lang, "/find/")}>← {t.backToList}</a></p>
+</Base>

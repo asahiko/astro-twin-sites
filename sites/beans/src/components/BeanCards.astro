@@ -1,0 +1,45 @@
+---
+// Bean cards. The data-* attributes drive the client-side finder on /find/.
+import { localize, type Lang } from "@twin/kit/i18n";
+import type { getBeans } from "../lib/content";
+import { label, regionOf, ROASTS, UI } from "../lib/labels";
+
+interface Props { lang: Lang; items: Awaited<ReturnType<typeof getBeans>> }
+const { lang, items } = Astro.props;
+---
+<ul class="bean-grid">
+  {items.map(({ data }) => {
+    const rank = ROASTS.indexOf(data.roast);
+    return (
+      <li
+        class="bean"
+        data-type={data.type}
+        data-country={data.country.join(" ")}
+        data-region={[...new Set(data.country.map(regionOf))].join(" ")}
+        data-process={data.process.join(" ")}
+        data-roast={data.roast}
+        data-roast-rank={rank}
+        data-availability={data.availability}
+        data-pick={data.staffPick ? "1" : "0"}
+        data-initial={data.sortName[0]!.toUpperCase()}
+        data-name={data.sortName.toLowerCase()}
+        data-added={data.addedAt.toISOString()}
+      >
+        <a href={localize(lang, `/beans/${data.slug}/`)}>
+          <span class="chips">
+            <span class="chip chip-fictional">{UI[lang].fictional}</span>
+            <span class="chip chip-type">{label(data.type, lang)}</span>
+            {data.staffPick && <span class="chip chip-pick">★ {UI[lang].pick}</span>}
+            {data.availability !== "in-stock" && <span class="chip">{label(data.availability, lang)}</span>}
+          </span>
+          <span class="bean-title">{data.title}</span>
+          <span class="bean-origin">{data.country.map((c) => label(c, lang)).join(" / ")} · {data.process.map((p) => label(p, lang)).join(", ")}</span>
+          <span class="bean-summary">{data.summary}</span>
+          <span class="roast-meter" title={label(data.roast, lang)} aria-label={`${UI[lang].roast}: ${label(data.roast, lang)}`}>
+            {ROASTS.map((_, i) => <i class={i <= rank ? "on" : ""} />)}
+          </span>
+        </a>
+      </li>
+    );
+  })}
+</ul>

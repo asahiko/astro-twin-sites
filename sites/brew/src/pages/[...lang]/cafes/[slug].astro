@@ -1,0 +1,41 @@
+---
+import { render } from "astro:content";
+import { formatDate, LANGS, localize, otherLang, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import { getCafes } from "../../../lib/content";
+import { label, UI } from "../../../lib/labels";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LANGS) {
+    for (const item of await getCafes(lang)) {
+      paths.push({ params: { lang: lang === "ja" ? undefined : lang, slug: item.data.slug }, props: { lang, item } });
+    }
+  }
+  return paths;
+}
+type Props = { lang: Lang; item: Awaited<ReturnType<typeof getCafes>>[number] };
+const { lang, item } = Astro.props;
+const { data } = item;
+const t = UI[lang];
+const other = otherLang(lang);
+const altPath = item.langs.includes(other) ? localize(other, `/cafes/${data.slug}/`) : localize(other, "/cafes/");
+const { Content } = await render(item.entry);
+---
+<Base lang={lang} title={data.title} description={data.summary} altPath={altPath}>
+  <p class="breadcrumb"><a href={localize(lang, "/")}>{t.home}</a> › <a href={localize(lang, "/cafes/")}>{t.cafes}</a></p>
+  <article class="article">
+    <h1>{data.title}</h1>
+    <p class="article-meta">
+      <span>{data.area}</span>
+      <span class="chips">{data.category.map((c) => <a class="chip" href={localize(lang, `/cafes/?category=${c}`)}>{label(c, lang)}</a>)}</span>
+    </p>
+    <Content />
+    <dl>
+      {data.tags && <><dt>Tags</dt><dd>{data.tags.join(", ")}</dd></>}
+      {data.website && <><dt>{t.website}</dt><dd><a href={data.website} rel="noopener">{data.website}</a></dd></>}
+      {data.updatedAt && <><dt>{t.updated}</dt><dd>{formatDate(data.updatedAt, lang)}</dd></>}
+    </dl>
+  </article>
+  <p><a href={localize(lang, "/cafes/")}>← {t.backToList}</a></p>
+</Base>

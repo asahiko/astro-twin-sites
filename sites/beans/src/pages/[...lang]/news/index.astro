@@ -1,0 +1,17 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import CategoryFilter from "../../../components/CategoryFilter.astro";
+import NewsList from "../../../components/NewsList.astro";
+import { getNews } from "../../../lib/content";
+import { NEWS_CATEGORIES, UI } from "../../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const items = await getNews(lang);
+---
+<Base lang={lang} title={UI[lang].news}>
+  <h1>{UI[lang].news}</h1>
+  <CategoryFilter lang={lang} codes={NEWS_CATEGORIES} target="#news" />
+  <div id="news"><NewsList lang={lang} items={items} /></div>
+</Base>

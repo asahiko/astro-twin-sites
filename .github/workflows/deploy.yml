@@ -1,0 +1,78 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deploys at once; a newer push waits for the running one.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      # Builds brew, then beans against brew's fresh feed, then brew again against beans' feed.
+      - run: npm run build
+
+      - name: Configure SSH
+        id: ssh
+        env:
+          SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
+          SAKURA_USER: ${{ secrets.SAKURA_USER }}
+          SAKURA_SSH_KEY: ${{ secrets.SAKURA_SSH_KEY }}
+          SAKURA_KNOWN_HOSTS: ${{ secrets.SAKURA_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$SAKURA_SSH_KEY" ] || [ -z "$SAKURA_KNOWN_HOSTS" ]; then
+            echo "::warning::Deploy secrets are not set; built only, skipping deploy."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SAKURA_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pinned host key: the connection fails rather than trusting an unknown server.
+          printf '%s\n' "$SAKURA_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<CONFIG
+          Host sakura
+            HostName $SAKURA_HOST
+            User $SAKURA_USER
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+          CONFIG
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy beans
+        if: steps.ssh.outputs.ready == 'true'
+        run: scripts/deploy.sh beans
+
+      - name: Deploy brew
+        if: steps.ssh.outputs.ready == 'true'
+        run: scripts/deploy.sh brew
+
+      - name: Smoke test
+        if: steps.ssh.outputs.ready == 'true'
+        run: |
+          # Each site's public URL is its `site` setting in astro.config.mjs.
+          for site in brew beans; do
+            base=$(sed -nE 's/^ *site: "([^"]+)".*/\1/p' "sites/$site/astro.config.mjs")
+            for url in "$base/" "$base/news/feed/"; do
+              curl -fsS -o /dev/null -w "%{http_code} %{content_type}  $url\n" "$url" \
+                || echo "::warning::$url did not respond with 2xx (DNS/SSL may not be set up yet)"
+            done
+          done

@@ -1,0 +1,17 @@
+---
+import { formatDate, localize, type Lang } from "@twin/kit/i18n";
+import type { getNews } from "../lib/content";
+import { label } from "../lib/labels";
+
+interface Props { lang: Lang; items: Awaited<ReturnType<typeof getNews>> }
+const { lang, items } = Astro.props;
+---
+<ul class="news-list">
+  {items.map(({ data }) => (
+    <li data-category={data.category.join(" ")}>
+      <time datetime={data.date.toISOString()}>{formatDate(data.date, lang)}</time>
+      <span class="chips">{data.category.map((c) => <span class={`chip chip-${c}`}>{label(c, lang)}</span>)}</span>
+      <a href={localize(lang, `/news/${data.slug}/`)}>{data.title}</a>
+    </li>
+  ))}
+</ul>

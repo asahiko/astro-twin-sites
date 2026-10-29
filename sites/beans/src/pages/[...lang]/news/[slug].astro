@@ -1,0 +1,38 @@
+---
+import { render } from "astro:content";
+import { formatDate, LANGS, localize, otherLang, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import { getNews } from "../../../lib/content";
+import { label, UI } from "../../../lib/labels";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LANGS) {
+    for (const item of await getNews(lang)) {
+      paths.push({ params: { lang: lang === "ja" ? undefined : lang, slug: item.data.slug }, props: { lang, item } });
+    }
+  }
+  return paths;
+}
+type Props = { lang: Lang; item: Awaited<ReturnType<typeof getNews>>[number] };
+const { lang, item } = Astro.props;
+const { data } = item;
+const t = UI[lang];
+const other = otherLang(lang);
+const altPath = item.langs.includes(other) ? localize(other, `/news/${data.slug}/`) : localize(other, "/news/");
+const { Content } = await render(item.entry);
+---
+<Base lang={lang} title={data.title} description={data.summary} altPath={altPath}>
+  <p class="breadcrumb"><a href={localize(lang, "/")}>{t.home}</a> › <a href={localize(lang, "/news/")}>{t.news}</a></p>
+  <article class="article">
+    <h1>{data.title}</h1>
+    <p class="article-meta">
+      <time datetime={data.date.toISOString()}>{formatDate(data.date, lang)}</time>
+      <span class="chips">{data.category.map((c) => <a class="chip" href={localize(lang, `/news/?category=${c}`)}>{label(c, lang)}</a>)}</span>
+      {data.eventDate && <span>{t.eventDate}: {formatDate(data.eventDate, lang)}</span>}
+    </p>
+    {lang === "ja" && !item.langs.includes("en") && <p class="notice" lang="en">{UI.en.notTranslated}</p>}
+    <Content />
+  </article>
+  <p><a href={localize(lang, "/news/")}>← {t.backToList}</a></p>
+</Base>

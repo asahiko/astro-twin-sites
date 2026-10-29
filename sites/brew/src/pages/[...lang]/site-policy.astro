@@ -1,0 +1,25 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../layouts/Base.astro";
+import { UI } from "../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+---
+<Base lang={lang} title={UI[lang].policy}>
+  <article class="article">
+    <h1>{UI[lang].policy}</h1>
+    <p>{UI[lang].disclaimer}</p>
+    {lang === "ja" ? (
+      <ul>
+        <li>このサイトは Cookie やアクセス解析を使用していません。</li>
+        <li>外部サイトへのリンク先の内容について、当サイトは責任を負いません。</li>
+      </ul>
+    ) : (
+      <ul>
+        <li>This site uses no cookies and no analytics.</li>
+        <li>We are not responsible for the content of external sites we link to.</li>
+      </ul>
+    )}
+  </article>
+</Base>

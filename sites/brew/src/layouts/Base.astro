@@ -1,0 +1,73 @@
+---
+import "../styles/global.css";
+import { localize, otherLang, splitLangPath, type Lang } from "@twin/kit/i18n";
+import Logo from "../components/Logo.astro";
+import { UI } from "../lib/labels";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** Path of this page in the other language; `null` when there is no translation. */
+  altPath?: string | null;
+}
+const { lang, title, description } = Astro.props;
+const t = UI[lang];
+const other = otherLang(lang);
+const [, rest] = splitLangPath(Astro.url.pathname);
+const altPath = Astro.props.altPath === undefined ? localize(other, rest) : Astro.props.altPath;
+const pageTitle = title ? `${title} | ${t.siteName}` : `${t.siteName} — ${t.tagline}`;
+const nav = [
+  { href: "/", label: t.home },
+  { href: "/news/", label: t.news },
+  { href: "/cafes/", label: t.cafes },
+  { href: "/about/", label: t.about },
+  { href: "/contact/", label: t.contact },
+];
+const current = (href: string) => (href === "/" ? rest === "/" : rest.startsWith(href));
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description ?? t.tagline} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    {altPath && <link rel="alternate" hreflang={other} href={new URL(altPath, Astro.site)} />}
+    <link rel="alternate" type="application/rss+xml" title={`${t.siteName} ${t.news}`} href={localize(lang, "/news/feed/")} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href={localize(lang, "/")}><Logo /><span class="tagline">{t.tagline}</span></a>
+        <div class="header-tools">
+          <form class="search-form" action={localize(lang, "/search/")} method="get" role="search">
+            <input type="search" name="q" placeholder={t.searchPlaceholder} aria-label={t.search} />
+          </form>
+          {altPath && <a class="lang-switch" href={altPath} hreflang={other} lang={other}>{t.switchTo}</a>}
+        </div>
+      </div>
+      <nav class="global-nav" aria-label="Global">
+        <ul class="wrap">
+          {nav.map((n) => <li><a href={localize(lang, n.href)} aria-current={current(n.href) ? "page" : undefined}>{n.label}</a></li>)}
+        </ul>
+      </nav>
+    </header>
+    <main class="wrap" data-pagefind-body>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <ul class="footer-links">
+          <li><a href={localize(lang, "/site-policy/")}>{t.policy}</a></li>
+          <li><a href={localize(lang, "/news/feed/")}>RSS</a></li>
+          <li><a href={new URL(localize(lang, "/"), "https://beans.brew.asahiko.link").href}>BeanDaCs</a></li>
+        </ul>
+        <p class="disclaimer">{t.disclaimer}</p>
+        <p class="copyright">© {new Date().getFullYear()} Brew Tsukuba (demo)</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+---
+// Client-side filter: toggles `[data-category]` items and keeps `?category=` in the URL.
+import type { Lang } from "@twin/kit/i18n";
+import { label, UI } from "../lib/labels";
+
+interface Props { lang: Lang; codes: readonly string[]; target: string }
+const { lang, codes, target } = Astro.props;
+---
+<div class="filter" role="group" data-filter-target={target}>
+  <button type="button" data-filter="" aria-pressed="true">{UI[lang].all}</button>
+  {codes.map((c) => <button type="button" data-filter={c} aria-pressed="false">{label(c, lang)}</button>)}
+</div>
+<script>
+  for (const group of document.querySelectorAll<HTMLElement>("[data-filter-target]")) {
+    const items = document.querySelectorAll<HTMLElement>(`${group.dataset.filterTarget} [data-category]`);
+    const buttons = group.querySelectorAll<HTMLButtonElement>("[data-filter]");
+    const apply = (code: string) => {
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === code)));
+      items.forEach((el) => (el.hidden = code !== "" && !el.dataset.category!.split(" ").includes(code)));
+      const url = new URL(location.href);
+      code ? url.searchParams.set("category", code) : url.searchParams.delete("category");
+      history.replaceState(null, "", url);
+    };
+    buttons.forEach((b) => b.addEventListener("click", () => apply(b.dataset.filter!)));
+    const initial = new URLSearchParams(location.search).get("category") ?? "";
+    if ([...buttons].some((b) => b.dataset.filter === initial)) apply(initial);
+  }
+</script>

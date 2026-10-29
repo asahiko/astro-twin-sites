@@ -1,0 +1,19 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../layouts/Base.astro";
+import { UI } from "../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+---
+<Base lang={lang} title={UI[lang].contact}>
+  <article class="article">
+    <h1>{UI[lang].contact}</h1>
+    {lang === "ja" ? (
+      <p>このサイトはデモのため、お問合せ窓口は設けていません。掲載内容についてのご指摘は、GitHub リポジトリの Issue にお寄せください。</p>
+    ) : (
+      <p>As this is a demo, there is no contact desk. If you spot something wrong, please open an issue on the GitHub repository.</p>
+    )}
+    <p><a href="https://github.com/asahiko/astro-twin-sites/issues" rel="noopener">github.com/asahiko/astro-twin-sites/issues</a></p>
+  </article>
+</Base>

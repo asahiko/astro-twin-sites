@@ -1,0 +1,104 @@
+/* Brew Tsukuba — espresso, crema and paper */
+:root {
+  --espresso: #3b2416;
+  --roast: #6b4129;
+  --crema: #d9963f;
+  --crema-dark: #a8682a;
+  --cream: #f4e6d2;
+  --paper: #fbf7f1;
+  --ink: #2a211c;
+  --muted: #7a6a5e;
+  --line: #e6d9c7;
+  --leaf: #4f7a52;
+  --radius: 10px;
+  --font: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  --serif: Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); line-height: 1.75; }
+a { color: var(--roast); }
+a:hover { color: var(--crema-dark); }
+img { max-width: 100%; height: auto; }
+h1, h2, h3 { font-family: var(--serif); color: var(--espresso); line-height: 1.35; }
+h1 { font-size: 1.9rem; margin: 2rem 0 1rem; }
+h2 { font-size: 1.35rem; margin: 2.2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--crema); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.muted { color: var(--muted); }
+[hidden] { display: none !important; }
+
+/* Header */
+.site-header { background: #fff; border-bottom: 1px solid var(--line); }
+.header-inner { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 12px; padding-bottom: 12px; }
+.brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.logo { width: 180px; height: auto; display: block; }
+.tagline { color: var(--muted); font-size: 0.85rem; }
+.header-tools { display: flex; gap: 12px; align-items: center; }
+.search-form input { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.9rem; width: 200px; max-width: 50vw; background: var(--paper); }
+.lang-switch { border: 1px solid var(--roast); border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+.global-nav { background: var(--espresso); }
+.global-nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; margin: 0 auto; }
+.global-nav a { display: block; padding: 10px 14px; color: var(--cream); text-decoration: none; font-size: 0.95rem; }
+.global-nav a:hover, .global-nav a[aria-current="page"] { background: var(--roast); color: #fff; }
+
+/* Hero */
+.hero { margin: 24px 0 8px; padding: 48px 32px; border-radius: var(--radius); color: var(--cream);
+  background: radial-gradient(circle at 85% 20%, rgba(217,150,63,.55), transparent 45%),
+              repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0 12px, transparent 12px 24px),
+              linear-gradient(135deg, var(--espresso), var(--roast)); }
+.hero h1 { color: #fff; margin: 0 0 0.5rem; font-size: 2.2rem; }
+.hero p { margin: 0; max-width: 40em; }
+
+/* Home grid */
+.home-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+@media (max-width: 800px) { .home-grid { grid-template-columns: 1fr; } }
+.section-more { text-align: right; margin: 0.5rem 0 0; font-size: 0.9rem; }
+
+/* Lists */
+.news-list, .headline-list { list-style: none; padding: 0; margin: 0; }
+.news-list li { display: grid; grid-template-columns: 7.5em auto 1fr; gap: 4px 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+@media (max-width: 600px) { .news-list li { grid-template-columns: auto 1fr; } .news-list li a { grid-column: 1 / -1; } }
+.news-list time, .headline-list time { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.chips { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-block; font-size: 0.72rem; padding: 1px 8px; border-radius: 999px; background: var(--cream); color: var(--roast); white-space: nowrap; }
+.chip-event { background: #f6dcc0; }
+.chip-opening { background: #dfe9d6; color: var(--leaf); }
+
+.sibling { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 4px 20px 16px; align-self: start; }
+.sibling h2 { border-bottom-color: var(--leaf); font-size: 1.1rem; }
+.headline-list li { padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.headline-list time { display: block; }
+.sibling-more { font-size: 0.85rem; margin: 12px 0 0; }
+
+.cards { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.card a { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: transform .15s, box-shadow .15s; }
+.card a:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(59,36,22,.12); }
+.card-area { font-size: 0.78rem; color: var(--crema-dark); letter-spacing: .05em; }
+.card-title { font-family: var(--serif); font-size: 1.1rem; color: var(--espresso); }
+.card-summary { font-size: 0.88rem; color: var(--muted); flex: 1; }
+
+.filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+.filter button { font: inherit; font-size: 0.85rem; padding: 4px 14px; border-radius: 999px; border: 1px solid var(--roast); background: #fff; color: var(--roast); cursor: pointer; }
+.filter button[aria-pressed="true"] { background: var(--roast); color: #fff; }
+
+/* Article */
+.article { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 32px 24px; margin: 24px 0; }
+@media (max-width: 600px) { .article { padding: 4px 16px 16px; } }
+.article-meta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: var(--muted); font-size: 0.9rem; }
+.article dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.article dt { color: var(--muted); }
+.article dd { margin: 0; }
+.notice { background: var(--cream); padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; }
+.breadcrumb { font-size: 0.85rem; margin: 16px 0 0; color: var(--muted); }
+.breadcrumb a { color: var(--muted); }
+
+/* Footer */
+.site-footer { margin-top: 64px; background: var(--espresso); color: var(--cream); font-size: 0.85rem; padding: 24px 0; }
+.site-footer a { color: var(--cream); }
+.footer-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 16px; margin: 0 0 12px; }
+.disclaimer { opacity: .8; max-width: 52em; }
+.copyright { opacity: .6; margin: 0; }
+
+/* Pagefind UI */
+.pagefind-ui { --pagefind-ui-primary: var(--roast); --pagefind-ui-text: var(--ink); --pagefind-ui-border: var(--line); --pagefind-ui-tag: var(--cream); --pagefind-ui-font: var(--font); }

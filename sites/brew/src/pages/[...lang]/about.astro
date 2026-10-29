@@ -1,0 +1,31 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../layouts/Base.astro";
+import { UI } from "../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+---
+<Base lang={lang} title={UI[lang].about}>
+  <article class="article">
+    {lang === "ja" ? (
+      <>
+        <h1>このサイトについて</h1>
+        <p>Brew Tsukuba は、つくば市のカフェとコーヒーにまつわる話題を集める架空のポータルサイトです。静的サイトジェネレータ Astro で生成した HTML ファイルだけで動いており、サーバー側でプログラムは実行していません。</p>
+        <h2>姉妹サイト</h2>
+        <p>コーヒー豆の情報を産地・精製方法・種別で絞り込める <a href="https://beans.brew.asahiko.link/">BeanDaCs</a> と相互に新着情報を表示しています。お互いの RSS をビルド時に読み込み、静的な HTML として埋め込んでいます。</p>
+        <h2>運営</h2>
+        <p>個人の実験プロジェクトです。ソースコードは GitHub で公開しています。</p>
+      </>
+    ) : (
+      <>
+        <h1>About this site</h1>
+        <p>Brew Tsukuba is a fictional portal collecting café and coffee topics from Tsukuba, Japan. It is built with the static site generator Astro and served as plain HTML files; no program runs on the server.</p>
+        <h2>Sister site</h2>
+        <p>It exchanges headlines with <a href="https://beans.brew.asahiko.link/en/">BeanDaCs</a>, a catalog of coffee beans you can filter by origin, process and type. Each site reads the other's RSS feed at build time and bakes the headlines into static HTML.</p>
+        <h2>Who runs this</h2>
+        <p>A personal experiment. The source code is public on GitHub.</p>
+      </>
+    )}
+  </article>
+</Base>

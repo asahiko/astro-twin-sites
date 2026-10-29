@@ -1,0 +1,27 @@
+---
+import { formatDate, localize, type Lang } from "@twin/kit/i18n";
+import { getSiblingNews } from "../lib/content";
+import { UI } from "../lib/labels";
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = UI[lang];
+const items = await getSiblingNews(lang);
+const siblingHome = new URL(localize(lang, "/"), "https://beans.brew.asahiko.link").href;
+---
+<section class="sibling" aria-labelledby="sibling-heading">
+  <h2 id="sibling-heading">{t.siblingHeading}</h2>
+  {items.length === 0 ? (
+    <p class="muted">{t.siblingEmpty}</p>
+  ) : (
+    <ul class="headline-list">
+      {items.map((n) => (
+        <li>
+          <time datetime={n.data.pubDate.toISOString()}>{formatDate(n.data.pubDate, lang)}</time>
+          <a href={n.data.link} rel="noopener">{n.data.title}</a>
+        </li>
+      ))}
+    </ul>
+  )}
+  <p class="sibling-more"><a href={siblingHome} rel="noopener">{t.siblingLink} →</a></p>
+</section>

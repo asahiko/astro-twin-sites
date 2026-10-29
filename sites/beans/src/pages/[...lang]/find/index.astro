@@ -1,0 +1,153 @@
+---
+// Bean finder: all filtering and sorting
+// happen in the browser over the data-* attributes of the statically rendered cards.
+// Filter state lives in the query string, e.g. /find/?type=blend&country=ET&country=KE&sort=newest
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import BeanCards from "../../../components/BeanCards.astro";
+import { getBeans } from "../../../lib/content";
+import { AVAILABILITY, BEAN_TYPES, label, ORIGINS, PROCESSES, REGIONS, ROASTS, UI } from "../../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = UI[lang];
+const items = await getBeans(lang);
+const initials = new Set(items.map((b) => b.data.sortName[0]!.toUpperCase()));
+const facets = [
+  { key: "type", legend: t.type, codes: BEAN_TYPES },
+  { key: "process", legend: t.process, codes: PROCESSES },
+  { key: "roast", legend: t.roast, codes: ROASTS },
+  { key: "availability", legend: t.availability, codes: AVAILABILITY },
+];
+---
+<Base lang={lang} title={t.find}>
+  <h1>{t.find}</h1>
+  <p class="notice">{t.fictionalNote}</p>
+  <div class="finder" id="finder">
+    <form class="facets" aria-label="Filters">
+      {facets.slice(0, 1).map((f) => (
+        <fieldset>
+          <legend>{f.legend}</legend>
+          {f.codes.map((c) => <label><input type="checkbox" name={f.key} value={c} />{label(c, lang)}</label>)}
+        </fieldset>
+      ))}
+      <fieldset>
+        <legend>{t.origin}</legend>
+        {REGIONS.map((r) => (
+          <details>
+            <summary><label style="display:inline-flex"><input type="checkbox" name="region" value={r} />{label(r, lang)}</label></summary>
+            <div class="sub">
+              {ORIGINS[r].map((c) => <label><input type="checkbox" name="country" value={c} data-parent={r} />{label(c, lang)}</label>)}
+            </div>
+          </details>
+        ))}
+      </fieldset>
+      {facets.slice(1).map((f) => (
+        <fieldset>
+          <legend>{f.legend}</legend>
+          {f.codes.map((c) => <label><input type="checkbox" name={f.key} value={c} />{label(c, lang)}</label>)}
+        </fieldset>
+      ))}
+      <fieldset>
+        <label><input type="checkbox" name="pick" value="1" />★ {t.pickOnly}</label>
+      </fieldset>
+      <fieldset>
+        <legend>{t.initial}</legend>
+        <div class="initials">
+          {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((l) => (
+            <button type="button" data-initial={l} aria-pressed="false" disabled={!initials.has(l)}>{l}</button>
+          ))}
+        </div>
+      </fieldset>
+      <button type="reset" class="reset">{t.reset}</button>
+    </form>
+    <div>
+      <div class="finder-bar">
+        <p class="count-label" aria-live="polite"><strong id="count">{items.length}</strong> {t.results}</p>
+        <label>{t.sort}:
+          <select name="sort" form="">
+            <option value="name">{t.sortName}</option>
+            <option value="newest">{t.sortNewest}</option>
+            <option value="roast">{t.sortRoast}</option>
+          </select>
+        </label>
+      </div>
+      <BeanCards lang={lang} items={items} />
+      <p id="empty" class="notice" hidden>{t.noResults}</p>
+    </div>
+  </div>
+</Base>
+
+<script>
+  const root = document.getElementById("finder")!;
+  const form = root.querySelector("form")!;
+  const sortSelect = root.querySelector<HTMLSelectElement>("select[name=sort]")!;
+  const list = root.querySelector(".bean-grid")!;
+  const cards = [...list.querySelectorAll<HTMLElement>(".bean")];
+  const initialButtons = [...form.querySelectorAll<HTMLButtonElement>("[data-initial]")];
+  const FACETS = ["type", "region", "country", "process", "roast", "availability"] as const;
+  let initial = "";
+
+  const checked = (name: string) =>
+    [...form.querySelectorAll<HTMLInputElement>(`input[name=${name}]:checked`)].map((i) => i.value);
+
+  // A card passes a facet if no box is ticked or it shares any ticked value (OR within a facet, AND across facets).
+  // Region and country form one origin facet: ticking a region matches all of its countries.
+  function matches(card: HTMLElement): boolean {
+    const has = (attr: string, values: string[]) => card.dataset[attr]!.split(" ").some((v) => values.includes(v));
+    for (const f of ["type", "process", "roast", "availability"]) {
+      const v = checked(f);
+      if (v.length && !has(f, v)) return false;
+    }
+    const regions = checked("region"), countries = checked("country");
+    if ((regions.length || countries.length) && !(has("region", regions) || has("country", countries))) return false;
+    if (checked("pick").length && card.dataset.pick !== "1") return false;
+    if (initial && card.dataset.initial !== initial) return false;
+    return true;
+  }
+
+  const sorters: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
+    name: (a, b) => a.dataset.name!.localeCompare(b.dataset.name!),
+    newest: (a, b) => b.dataset.added!.localeCompare(a.dataset.added!),
+    roast: (a, b) => Number(a.dataset.roastRank) - Number(b.dataset.roastRank) || sorters.name!(a, b),
+  };
+
+  function update(syncUrl = true) {
+    let n = 0;
+    for (const card of cards) n += Number(!(card.hidden = !matches(card)));
+    cards.sort(sorters[sortSelect.value] ?? sorters.name).forEach((c) => list.append(c));
+    root.querySelector("#count")!.textContent = String(n);
+    root.querySelector<HTMLElement>("#empty")!.hidden = n > 0;
+    initialButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.initial === initial)));
+    if (!syncUrl) return;
+    const params = new URLSearchParams();
+    for (const f of [...FACETS, "pick"]) checked(f).forEach((v) => params.append(f, v));
+    if (initial) params.set("initial", initial);
+    if (sortSelect.value !== "name") params.set("sort", sortSelect.value);
+    const qs = params.toString();
+    history.replaceState(null, "", qs ? `?${qs}` : location.pathname);
+  }
+
+  // Restore state from the query string (links like /find/?type=blend from the home page).
+  const params = new URLSearchParams(location.search);
+  for (const f of [...FACETS, "pick"]) {
+    for (const v of params.getAll(f)) {
+      const box = form.querySelector<HTMLInputElement>(`input[name=${f}][value="${CSS.escape(v)}"]`);
+      if (box) box.checked = true;
+    }
+  }
+  for (const box of form.querySelectorAll<HTMLInputElement>("input[name=country]:checked")) {
+    box.closest("details")!.open = true;
+  }
+  initial = params.get("initial") ?? "";
+  sortSelect.value = params.get("sort") ?? "name";
+
+  form.addEventListener("change", () => update());
+  sortSelect.addEventListener("change", () => update());
+  form.addEventListener("reset", () => { initial = ""; setTimeout(() => update()); });
+  initialButtons.forEach((b) => b.addEventListener("click", () => {
+    initial = initial === b.dataset.initial ? "" : b.dataset.initial!;
+    update();
+  }));
+  update(false);
+</script>

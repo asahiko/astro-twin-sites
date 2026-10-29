@@ -1,0 +1,21 @@
+{
+  "name": "astro-twin-sites",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "sites/*"
+  ],
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev:brew": "npm run dev -w sites/brew",
+    "dev:beans": "npm run dev -w sites/beans",
+    "build:brew": "npm run build -w sites/brew",
+    "build:beans": "npm run build -w sites/beans",
+    "build": "bash scripts/build-twin.sh",
+    "preview:brew": "npm run preview -w sites/brew",
+    "preview:beans": "npm run preview -w sites/beans"
+  }
+}

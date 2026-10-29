@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://brew.asahiko.link/sitemap-index.xml

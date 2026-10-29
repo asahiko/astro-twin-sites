@@ -1,0 +1,20 @@
+---
+import { localize, type Lang } from "@twin/kit/i18n";
+import type { getCafes } from "../lib/content";
+import { label } from "../lib/labels";
+
+interface Props { lang: Lang; items: Awaited<ReturnType<typeof getCafes>> }
+const { lang, items } = Astro.props;
+---
+<ul class="cards">
+  {items.map(({ data }) => (
+    <li class="card" data-category={data.category.join(" ")}>
+      <a href={localize(lang, `/cafes/${data.slug}/`)}>
+        <span class="card-area">{data.area}</span>
+        <strong class="card-title">{data.title}</strong>
+        <span class="card-summary">{data.summary}</span>
+        <span class="chips">{data.category.map((c) => <span class="chip">{label(c, lang)}</span>)}</span>
+      </a>
+    </li>
+  ))}
+</ul>
