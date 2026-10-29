@@ -177,7 +177,7 @@ The workflow reads these GitHub Actions secrets:
 2. **Domains.** In the server's control panel, add both domains and set their public folders:
    - `<brew-domain>` → `~/www/brew`
    - `<beans-domain>` → `~/www/beans`
-3. **SSL.** Enable a certificate for both domains once DNS resolves. Then uncomment the HTTPS redirect in `sites/*/public/.htaccess`.
+3. **SSL.** Enable a certificate for both domains once DNS resolves. `sites/*/public/.htaccess` redirects HTTP to HTTPS, so comment that rule out until the certificates are active.
 4. **Deploy key.** Generate a dedicated key pair locally and authorize it on the server:
    ```bash
    ssh-keygen -t ed25519 -N "" -C "astro-twin-sites deploy" -f ~/.ssh/astro-twin-deploy

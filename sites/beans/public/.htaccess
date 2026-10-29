@@ -10,10 +10,10 @@ ErrorDocument 404 /404.html
   RewriteEngine On
   # Force HTTPS. Sakura terminates TLS at its proxy, so %{HTTPS} is never "on" here;
   # the proxy marks forwarded HTTPS requests with X-Sakura-Forwarded-For instead.
-  # Uncomment once the free SSL certificate for this domain is active.
-  # RewriteCond %{HTTPS} off
-  # RewriteCond %{HTTP:X-Sakura-Forwarded-For} ^$
-  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  # Requires the free SSL certificate for this domain to be active.
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Sakura-Forwarded-For} ^$
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 </IfModule>
 
 <IfModule mod_headers.c>
