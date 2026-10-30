@@ -2,7 +2,7 @@
 
 English | [日本語](README.ja.md)
 
-Demo of bilingual twin Astro static sites that share headlines, with search, filtering, and CI/CD deploys to a rental server.
+Demo of twin Astro static sites that share headlines, with search, filtering, and CI/CD deploys to a rental server.
 
 ## Features
 
