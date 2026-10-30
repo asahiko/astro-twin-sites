@@ -1,0 +1,48 @@
+---
+// Frame shared by a bean's pages: a header band with the bean's name, and a sidebar that switches
+// between the basic info page and one page per kind of note. Kinds without notes are shown greyed out.
+import { localize, type Lang } from "@twin/kit/i18n";
+import type { getBeans, getNotes } from "../lib/content";
+import { label, NOTE_KINDS, UI } from "../lib/labels";
+
+interface Props {
+  lang: Lang;
+  bean: Awaited<ReturnType<typeof getBeans>>[number];
+  notes: Awaited<ReturnType<typeof getNotes>>;
+  /** "info" for the basic info page, or a note kind. */
+  active: string;
+}
+const { lang, bean, notes, active } = Astro.props;
+const { data } = bean;
+const t = UI[lang];
+const base = localize(lang, `/beans/${data.slug}/`);
+const count = (kind: string) => notes.filter((n) => n.data.kind === kind).length;
+---
+<p class="breadcrumb">
+  <a href={localize(lang, "/")}>{t.home}</a> › <a href={localize(lang, "/find/")}>{t.find}</a>
+  {active !== "info" && <> › <a href={base}>{data.title}</a></>}
+</p>
+<header class="bean-head">
+  <p class="chips">
+    <span class="chip chip-fictional">{t.fictional}</span>
+    <span class="chip chip-type">{label(data.type, lang)}</span>
+    {data.staffPick && <span class="chip chip-pick">★ {t.pick}</span>}
+  </p>
+  {active === "info" ? <h1 class="bean-head-title">{data.title}</h1> : <p class="bean-head-title">{data.title}</p>}
+  <p class="bean-origin">{data.country.map((c) => label(c, lang)).join(" / ")} · {data.process.map((p) => label(p, lang)).join(", ")}</p>
+</header>
+<div class="bean-layout">
+  <nav class="bean-menu" aria-label={data.title}>
+    <ul>
+      <li><a href={base} aria-current={active === "info" ? "page" : undefined}>{t.basicInfo}</a></li>
+      {NOTE_KINDS.map((k) => (
+        <li>
+          {count(k)
+            ? <a href={`${base}${k}/`} aria-current={active === k ? "page" : undefined}>{label(k, lang)}<span class="count">{count(k)}</span></a>
+            : <span aria-disabled="true">{label(k, lang)}<span class="count">0</span></span>}
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="bean-main"><slot /></div>
+</div>

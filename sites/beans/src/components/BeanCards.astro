@@ -1,15 +1,18 @@
 ---
 // Bean cards. The data-* attributes drive the client-side finder on /find/.
 import { localize, type Lang } from "@twin/kit/i18n";
-import type { getBeans } from "../lib/content";
-import { label, regionOf, ROASTS, UI } from "../lib/labels";
+import { getNotesByBean, type getBeans } from "../lib/content";
+import { label, NOTE_KINDS, regionOf, ROASTS, UI } from "../lib/labels";
 
 interface Props { lang: Lang; items: Awaited<ReturnType<typeof getBeans>> }
 const { lang, items } = Astro.props;
+const notesByBean = await getNotesByBean(lang);
 ---
 <ul class="bean-grid">
   {items.map(({ data }) => {
     const rank = ROASTS.indexOf(data.roast);
+    const notes = notesByBean.get(data.slug) ?? [];
+    const kinds = NOTE_KINDS.filter((k) => notes.some((n) => n.data.kind === k));
     return (
       <li
         class="bean"
@@ -24,6 +27,7 @@ const { lang, items } = Astro.props;
         data-initial={data.sortName[0]!.toUpperCase()}
         data-name={data.sortName.toLowerCase()}
         data-added={data.addedAt.toISOString()}
+        data-notes={kinds.join(" ")}
       >
         <a href={localize(lang, `/beans/${data.slug}/`)}>
           <span class="chips">
@@ -35,6 +39,7 @@ const { lang, items } = Astro.props;
           <span class="bean-title">{data.title}</span>
           <span class="bean-origin">{data.country.map((c) => label(c, lang)).join(" / ")} · {data.process.map((p) => label(p, lang)).join(", ")}</span>
           <span class="bean-summary">{data.summary}</span>
+          {notes.length > 0 && <span class="bean-notes">{UI[lang].notes} {notes.length}</span>}
           <span class="roast-meter" title={label(data.roast, lang)} aria-label={`${UI[lang].roast}: ${label(data.roast, lang)}`}>
             {ROASTS.map((_, i) => <i class={i <= rank ? "on" : ""} />)}
           </span>

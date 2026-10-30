@@ -10,5 +10,3 @@ flavor: ["Dark chocolate", "Orange", "Smoke", "Caramel"]
 Dark chocolate and caramel richness, lifted by a bright note like orange zest. A faint smokiness makes it a natural partner for sweets.
 
 Try it as a flannel drip, or in a French press with a slightly coarse grind.
-
-> Note: this bean, including its farm, lot, roaster and tasting notes, is fictional and was written for building this website.

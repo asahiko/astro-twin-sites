@@ -10,5 +10,3 @@ flavor: ["Red apple", "Panela", "Hazelnut"]
 Juicy red-apple acidity and a sweetness reminiscent of panela, Colombia's unrefined cane sugar, tied together by a toasty hazelnut finish.
 
 It works well as drip, espresso or cold brew, so it is a safe bag to pick when you can't decide.
-
-> Note: this bean, including its farm, lot, roaster and tasting notes, is fictional and was written for building this website.

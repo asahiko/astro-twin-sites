@@ -19,5 +19,3 @@ Water two or three degrees hotter than in summer helps offset the heat lost duri
 Making one or two cups at a time, rather than a big batch, means the coffee stays good to the last sip.
 
 Take your time with a steaming cup on those chilly mornings.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

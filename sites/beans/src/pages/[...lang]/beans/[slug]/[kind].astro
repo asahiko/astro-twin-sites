@@ -1,0 +1,47 @@
+---
+// One page per bean and kind of note, e.g. /beans/red-ridge-nyeri/recipe/. Only kinds with notes get a page.
+import { LANGS, localize, otherLang, type Lang } from "@twin/kit/i18n";
+import Base from "../../../../layouts/Base.astro";
+import BeanShell from "../../../../components/BeanShell.astro";
+import NoteList from "../../../../components/NoteList.astro";
+import { getBeans, getNotesByBean, type getNotes } from "../../../../lib/content";
+import { label, NOTE_KINDS, UI, type NoteKind } from "../../../../lib/labels";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LANGS) {
+    const notesByBean = await getNotesByBean(lang);
+    const otherNotes = await getNotesByBean(otherLang(lang));
+    for (const bean of await getBeans(lang)) {
+      const notes = notesByBean.get(bean.data.slug) ?? [];
+      for (const kind of NOTE_KINDS.filter((k) => notes.some((n) => n.data.kind === k))) {
+        const translated = (otherNotes.get(bean.data.slug) ?? []).some((n) => n.data.kind === kind);
+        paths.push({
+          params: { lang: lang === "ja" ? undefined : lang, slug: bean.data.slug, kind },
+          props: { lang, bean, notes, kind, translated },
+        });
+      }
+    }
+  }
+  return paths;
+}
+type Props = {
+  lang: Lang;
+  bean: Awaited<ReturnType<typeof getBeans>>[number];
+  notes: Awaited<ReturnType<typeof getNotes>>;
+  kind: NoteKind;
+  translated: boolean;
+};
+const { lang, bean, notes, kind, translated } = Astro.props;
+const other = otherLang(lang);
+const altPath = translated
+  ? localize(other, `/beans/${bean.data.slug}/${kind}/`)
+  : bean.langs.includes(other) ? localize(other, `/beans/${bean.data.slug}/`) : localize(other, "/find/");
+---
+<Base lang={lang} title={`${label(kind, lang)} — ${bean.data.title}`} altPath={altPath}>
+  <BeanShell lang={lang} bean={bean} notes={notes} active={kind}>
+    <h1>{label(kind, lang)}</h1>
+    <p class="notice">{UI[lang].notesFictional}</p>
+    <NoteList lang={lang} items={notes.filter((n) => n.data.kind === kind)} showBeans={false} detailed />
+  </BeanShell>
+</Base>

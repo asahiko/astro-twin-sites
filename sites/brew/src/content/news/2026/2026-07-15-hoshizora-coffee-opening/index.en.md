@@ -11,5 +11,3 @@ As the name ("starry sky") suggests, the shop is all about the evening hours and
 There are usually about five beans on offer, from light to dark roasts. To celebrate the opening, a cold-brew "Summer Night Blend" is available throughout July.
 
 One more place to drop by on the way home from work.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

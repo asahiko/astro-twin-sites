@@ -11,5 +11,3 @@ We're hosting an online cupping to compare three light roasts, centered on 'Clou
 - We'll send sample beans in advance for you to brew at home
 
 First-time cuppers are welcome. We'll walk through how to smell, slurp and score at a relaxed pace.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

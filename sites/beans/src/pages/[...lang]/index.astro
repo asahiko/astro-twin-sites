@@ -3,16 +3,18 @@ import { langPaths, localize, type Lang } from "@twin/kit/i18n";
 import Base from "../../layouts/Base.astro";
 import BeanCards from "../../components/BeanCards.astro";
 import NewsList from "../../components/NewsList.astro";
+import NoteList from "../../components/NoteList.astro";
 import SiblingHeadlines from "../../components/SiblingHeadlines.astro";
-import { getBeans, getNews } from "../../lib/content";
+import { getBeans, getNews, getNotes } from "../../lib/content";
 import { BEAN_TYPES, label, UI } from "../../lib/labels";
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
 const t = UI[lang];
 const beans = await getBeans(lang);
-const picks = beans.filter((b) => b.data.staffPick && b.data.availability !== "archived").slice(0, 3);
+const picks = beans.filter((b) => b.data.staffPick && b.data.availability !== "archived").slice(0, 4);
 const news = (await getNews(lang)).slice(0, 5);
+const notes = (await getNotes(lang)).slice(0, 3);
 const lead = {
   ja: "産地・精製方法・焙煎度などのメタデータでコーヒー豆を横断的にさがせる、架空のデータカタログです。",
   en: "A fictional data catalog for finding coffee beans across origin, process, roast and more.",
@@ -39,6 +41,9 @@ const lead = {
       <p class="notice">{t.fictionalNote}</p>
       <BeanCards lang={lang} items={picks} />
       <p class="section-more"><a href={localize(lang, "/find/?pick=1")}>{t.more} →</a></p>
+      <h2>{t.latestNotes}</h2>
+      <NoteList lang={lang} items={notes} />
+      <p class="section-more"><a href={localize(lang, "/notes/")}>{t.more} →</a></p>
       <h2>{t.news}</h2>
       <NewsList lang={lang} items={news} />
       <p class="section-more"><a href={localize(lang, "/news/")}>{t.more} →</a></p>

@@ -12,5 +12,3 @@ We've rebuilt the Find Beans page so you can combine several filters at once.
 - Sorting by name, newest or roast level
 
 Your filters are kept in the URL, so you can bookmark a favorite search or share it with a friend.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

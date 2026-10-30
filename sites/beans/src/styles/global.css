@@ -127,3 +127,36 @@ h2 { font-size: 1.2rem; margin: 2rem 0 0.8rem; padding-left: 10px; border-left: 
 .copyright { margin: 0; }
 
 .pagefind-ui { --pagefind-ui-primary: var(--teal); --pagefind-ui-text: var(--ink); --pagefind-ui-border: var(--line); --pagefind-ui-tag: var(--mint); --pagefind-ui-font: var(--font); }
+
+/* Bean notes */
+.note-list .note-beans { grid-column: 1 / -1; font-size: 0.82rem; color: var(--muted); }
+.note-list .note-beans::before { content: "☕ "; }
+.chip-cupping-log { background: #e3eef8; color: #24527a; }
+.chip-recipe { background: #fbecd0; color: #7a520c; }
+.chip-review { background: #f3e1ef; color: #7a2e6a; }
+.chip-voice { background: #e6f0e0; color: #3d6326; }
+.note-list .note-summary { grid-column: 1 / -1; font-size: 0.88rem; }
+
+/* Bean pages: header band + sidebar menu (basic info / one page per kind of note) */
+.bean-head { margin: 12px 0 20px; padding: 18px 20px; background: var(--mint); border-radius: var(--radius); }
+.bean-head .chips { margin: 0 0 6px; }
+.bean-head-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 4px; color: var(--forest); line-height: 1.35; }
+.bean-head .bean-origin { margin: 0; }
+.bean-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: start; }
+.bean-main, .bean-menu { min-width: 0; }
+.bean-main > h1:first-child, .bean-main .article > h2:first-child { margin-top: 0; }
+.bean-menu ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); position: sticky; top: 16px; }
+.bean-menu li > * { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--line); text-decoration: none; color: var(--ink); }
+.bean-menu a:hover { background: var(--mint); }
+.bean-menu a[aria-current] { background: var(--forest); color: #fff; font-weight: 600; }
+.bean-menu [aria-disabled] { color: #a3aea9; background: #f5f6f5; cursor: default; }
+.bean-menu .count { font-size: 0.8rem; min-width: 1.6em; text-align: center; border-radius: 10px; background: #fff; color: var(--teal); border: 1px solid var(--line); }
+.bean-menu a[aria-current] .count { color: var(--forest); }
+.bean-menu [aria-disabled] .count { color: #a3aea9; }
+@media (max-width: 800px) {
+  .bean-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .bean-menu ul { position: static; display: flex; flex-wrap: wrap; gap: 6px; border: 0; }
+  .bean-menu li > * { border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; gap: 8px; white-space: nowrap; }
+}
+.bean-notes { font-size: 0.78rem; color: var(--teal); font-weight: 600; }
+.bean-notes::before { content: "✎ "; }

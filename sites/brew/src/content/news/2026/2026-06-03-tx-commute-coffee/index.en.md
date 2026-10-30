@@ -15,5 +15,3 @@ Since Tsukuba is the first stop, you can often get a seat, but eating and drinki
 On the way back, try getting off at Kenkyu-gakuen or Banpaku-kinenkoen and stopping by a café near the station. A quick "detour cup" to switch gears before you get home might just be the TX line's own little ritual.
 
 A thermos of home-brewed drip coffee works too. Find the commute coffee that suits you.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

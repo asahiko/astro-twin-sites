@@ -6,7 +6,7 @@ import { langPaths, type Lang } from "@twin/kit/i18n";
 import Base from "../../../layouts/Base.astro";
 import BeanCards from "../../../components/BeanCards.astro";
 import { getBeans } from "../../../lib/content";
-import { AVAILABILITY, BEAN_TYPES, label, ORIGINS, PROCESSES, REGIONS, ROASTS, UI } from "../../../lib/labels";
+import { AVAILABILITY, BEAN_TYPES, label, NOTE_KINDS, ORIGINS, PROCESSES, REGIONS, ROASTS, UI } from "../../../lib/labels";
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
@@ -18,6 +18,7 @@ const facets = [
   { key: "process", legend: t.process, codes: PROCESSES },
   { key: "roast", legend: t.roast, codes: ROASTS },
   { key: "availability", legend: t.availability, codes: AVAILABILITY },
+  { key: "notes", legend: t.hasNotes, codes: NOTE_KINDS },
 ];
 ---
 <Base lang={lang} title={t.find}>
@@ -85,7 +86,7 @@ const facets = [
   const list = root.querySelector(".bean-grid")!;
   const cards = [...list.querySelectorAll<HTMLElement>(".bean")];
   const initialButtons = [...form.querySelectorAll<HTMLButtonElement>("[data-initial]")];
-  const FACETS = ["type", "region", "country", "process", "roast", "availability"] as const;
+  const FACETS = ["type", "region", "country", "process", "roast", "availability", "notes"] as const;
   let initial = "";
 
   const checked = (name: string) =>
@@ -95,7 +96,7 @@ const facets = [
   // Region and country form one origin facet: ticking a region matches all of its countries.
   function matches(card: HTMLElement): boolean {
     const has = (attr: string, values: string[]) => card.dataset[attr]!.split(" ").some((v) => values.includes(v));
-    for (const f of ["type", "process", "roast", "availability"]) {
+    for (const f of ["type", "process", "roast", "availability", "notes"]) {
       const v = checked(f);
       if (v.length && !has(f, v)) return false;
     }

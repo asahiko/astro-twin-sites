@@ -11,5 +11,3 @@ BeanDaCs lets you browse beans by origin, variety, processing method, and roast 
 - Website: [BeanDaCs (coffee bean catalog)](https://beans.brew.asahiko.link/)
 
 As part of this link-up, the latest BeanDaCs updates now appear on our home page. Enjoy the cup in front of you, and the story of the bean behind it.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

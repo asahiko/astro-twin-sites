@@ -1,0 +1,53 @@
+---
+import { render } from "astro:content";
+import { formatDate, LANGS, localize, otherLang, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import BeanCards from "../../../components/BeanCards.astro";
+import BeanShell from "../../../components/BeanShell.astro";
+import { getBeans, getNotes, getNotesByBean } from "../../../lib/content";
+import { label, UI } from "../../../lib/labels";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of LANGS) {
+    for (const item of await getNotes(lang)) {
+      paths.push({ params: { lang: lang === "ja" ? undefined : lang, slug: item.data.slug }, props: { lang, item } });
+    }
+  }
+  return paths;
+}
+type Props = { lang: Lang; item: Awaited<ReturnType<typeof getNotes>>[number] };
+const { lang, item } = Astro.props;
+const { data } = item;
+const t = UI[lang];
+const other = otherLang(lang);
+const altPath = item.langs.includes(other) ? localize(other, `/notes/${data.slug}/`) : localize(other, "/notes/");
+const beans = (await getBeans(lang)).filter((b) => data.beans.includes(b.data.slug));
+// The sidebar belongs to the first bean the note names; other beans are listed below the note.
+const primary = beans.find((b) => b.data.slug === data.beans[0])!;
+const primaryNotes = (await getNotesByBean(lang)).get(primary.data.slug) ?? [];
+const others = beans.filter((b) => b !== primary);
+const { Content } = await render(item.entry);
+---
+<Base lang={lang} title={data.title} description={data.summary} altPath={altPath}>
+  <BeanShell lang={lang} bean={primary} notes={primaryNotes} active={data.kind}>
+    <article class="article">
+      <h1>{data.title}</h1>
+      <p class="article-meta">
+        <span class="chip chip-fictional">{t.fictional}</span>
+        <a class={`chip chip-${data.kind}`} href={localize(lang, `/notes/?category=${data.kind}`)}>{label(data.kind, lang)}</a>
+        <time datetime={data.date.toISOString()}>{formatDate(data.date, lang)}</time>
+        {data.author && <span>{t.author}: {data.author}</span>}
+      </p>
+      {lang === "ja" && !item.langs.includes("en") && <p class="notice" lang="en">{UI.en.notTranslated}</p>}
+      <Content />
+    </article>
+    {others.length > 0 && (
+      <section>
+        <h2>{t.alsoCovers}</h2>
+        <BeanCards lang={lang} items={others} />
+      </section>
+    )}
+    <p><a href={localize(lang, `/beans/${primary.data.slug}/${data.kind}/`)}>← {label(data.kind, lang)}</a> · <a href={localize(lang, "/notes/")}>{t.notes}</a></p>
+  </BeanShell>
+</Base>

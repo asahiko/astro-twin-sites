@@ -15,6 +15,9 @@ export const PROCESSES = ["washed", "natural", "honey", "anaerobic", "wet-hulled
 export const ROASTS = ["light", "medium", "medium-dark", "dark"] as const;
 export const AVAILABILITY = ["in-stock", "seasonal", "archived"] as const;
 export const NEWS_CATEGORIES = ["catalog", "cupping", "notice"] as const;
+/** Kinds of notes attached to beans: cupping logs, recipes, reviews, and user voices. */
+export const NOTE_KINDS = ["cupping-log", "recipe", "review", "voice"] as const;
+export type NoteKind = (typeof NOTE_KINDS)[number];
 
 export type Region = keyof typeof ORIGINS;
 export const REGIONS = Object.keys(ORIGINS) as Region[];
@@ -60,6 +63,10 @@ const LABELS: Record<string, Record<Lang, string>> = {
   catalog: { ja: "カタログ更新", en: "Catalog" },
   cupping: { ja: "カッピング", en: "Cupping" },
   notice: { ja: "お知らせ", en: "Notices" },
+  "cupping-log": { ja: "カッピング記録", en: "Cupping logs" },
+  recipe: { ja: "淹れ方レシピ", en: "Recipes" },
+  review: { ja: "レビュー", en: "Reviews" },
+  voice: { ja: "利用者の声", en: "Voices" },
 };
 
 export function label(code: string, lang: Lang): string {
@@ -113,6 +120,14 @@ export const UI = {
     typeLead: "種別からさがす",
     fictional: "架空",
     fictionalNote: "このカタログの豆・農園・焙煎所・評価は、すべてウェブサイト構築用の架空の情報です。",
+    notes: "豆の記事",
+    notesLead: "カタログの豆にまつわるカッピング記録・淹れ方レシピ・レビュー・利用者の声です。",
+    notesFictional: "記事・筆者・感想はすべてウェブサイト構築用の架空のものです。",
+    basicInfo: "基本情報",
+    alsoCovers: "この記事で取り上げたほかの豆",
+    author: "筆者",
+    hasNotes: "記事のある豆",
+    latestNotes: "新着の記事",
   },
   en: {
     siteName: "BeanDaCs",
@@ -160,5 +175,13 @@ export const UI = {
     typeLead: "Browse by type",
     fictional: "Fictional",
     fictionalNote: "Every bean, farm, roaster and rating in this catalog is fictional, written for building this website.",
+    notes: "Bean Notes",
+    notesLead: "Cupping logs, brewing recipes, reviews and user voices about beans in the catalog.",
+    notesFictional: "All notes, authors and opinions are fictional, written for building this website.",
+    basicInfo: "Basic info",
+    alsoCovers: "Other beans in this note",
+    author: "Author",
+    hasNotes: "Beans with notes",
+    latestNotes: "Latest notes",
   },
 } satisfies Record<Lang, Record<string, string>>;

@@ -3,7 +3,7 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import { PAIR_PATTERN, pairId } from "@twin/kit/pairs";
 import { siblingFeedLoader, siblingNewsSchema } from "@twin/kit/sibling-feed";
-import { AVAILABILITY, BEAN_TYPES, COUNTRIES, NEWS_CATEGORIES, PROCESSES, ROASTS } from "./lib/labels";
+import { AVAILABILITY, BEAN_TYPES, COUNTRIES, NEWS_CATEGORIES, NOTE_KINDS, PROCESSES, ROASTS } from "./lib/labels";
 
 // Metadata fields are optional here because English files may leave them out and inherit them
 // from the Japanese file; src/lib/content.ts checks that the merged result is complete.
@@ -47,9 +47,24 @@ const news = defineCollection({
   }),
 });
 
+// Notes attached to beans (cupping logs, recipes, reviews, voices). `beans` lists bean slugs;
+// src/lib/content.ts fails the build if one does not exist.
+const notes = defineCollection({
+  loader: glob({ pattern: PAIR_PATTERN, base: "./src/content/notes", generateId: pairId }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string().optional(),
+    date: z.coerce.date().optional(),
+    kind: z.enum(NOTE_KINDS).optional(),
+    beans: z.union([z.string(), z.array(z.string())]).transform((v) => (Array.isArray(v) ? v : [v])).optional(),
+    author: z.string().optional(),
+    summary: z.string().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
 const siblingNews = defineCollection({
   loader: siblingFeedLoader({ source: process.env.SIBLING_FEED_SOURCE ?? "https://brew.asahiko.link/" }),
   schema: siblingNewsSchema,
 });
 
-export const collections = { beans, news, siblingNews };
+export const collections = { beans, news, notes, siblingNews };

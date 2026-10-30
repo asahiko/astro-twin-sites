@@ -105,11 +105,14 @@ sites/brew/src/content/news/2026/2026-10-01-some-topic/
 
 | URL (ja / en) | Page |
 |---|---|
-| `/` · `/en/` | Home: browse by type, staff picks, news, **Brew Tsukuba headlines** |
-| `/find/` | Finder: filter by type, origin (region › country), process, roast, availability, staff pick, initial letter; sort by name / newest / roast. State is kept in the query string (`/find/?type=blend&country=ET`). |
-| `/beans/<slug>/` | Bean detail; every metadata value links back into the finder |
+| `/` · `/en/` | Home: browse by type, staff picks, latest notes, news, **Brew Tsukuba headlines** |
+| `/find/` | Finder: filter by type, origin (region › country), process, roast, availability, staff pick, initial letter; sort by name / newest / roast. Also filters by which kinds of notes a bean has. State is kept in the query string (`/find/?type=blend&country=ET`). |
+| `/beans/<slug>/` · `/beans/<slug>/<kind>/` | Bean detail, with a sidebar menu: basic info (every metadata value links back into the finder), then one page per kind of note. Kinds without notes are greyed out. |
+| `/notes/` · `/notes/<slug>/` | Bean notes: cupping logs, recipes, reviews and user voices, each attached to one or more beans |
 | `/news/` · `/news/<slug>/` · `/news/feed/` | News and RSS |
 | `/about/`, `/contact/`, `/site-policy/`, `/search/` | Static pages, Pagefind search |
+
+A note names its beans by slug in frontmatter (`beans: [red-ridge-nyeri]`), and the build fails if a slug does not exist. The finder's "beans with notes" facet is computed at build time and stored on each card, so it needs no runtime lookup.
 
 Bean metadata lives in the Japanese file as codes, e.g. `type: blend`, `country: [ET, CO]`, `process: washed`. The finder runs entirely in the browser over `data-*` attributes on the pre-rendered cards. Within one facet, ticked values are combined with OR; across facets, with AND.
 
@@ -214,4 +217,4 @@ Concrete, environment-specific steps belong in `SETUP.local.md`. That file is gi
 
 ## Disclaimer
 
-This is a demo for a static-site experiment. All news items (on both sites) and everything in the bean catalog are fictional; Brew Tsukuba's news titles are marked 【架空】 / [Fictional]. The café guide introduces real Tsukuba cafés from publicly available information only, with no affiliation and no guarantee of accuracy.
+This is a demo for a static-site experiment. All news items (on both sites) and everything in the bean catalog, including the bean notes, are fictional; Brew Tsukuba's news titles are marked 【架空】 / [Fictional]. The café guide introduces real Tsukuba cafés from publicly available information only, with no affiliation and no guarantee of accuracy.

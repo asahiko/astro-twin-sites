@@ -13,5 +13,3 @@ Tsukuba is home to many students and researchers from abroad, along with their f
 The café guide and most news posts will be published in both languages. Some smaller local items may appear in Japanese only; those pages are clearly marked.
 
 If something reads oddly or is hard to follow, please let us know through the Contact page.
-
-> Note: this is a fictional notice written for building this website. It is not about any real shop, group or event.

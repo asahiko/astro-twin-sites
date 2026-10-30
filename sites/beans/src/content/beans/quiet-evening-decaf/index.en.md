@@ -10,5 +10,3 @@ flavor: ["Milk chocolate", "Brown sugar", "Red grape"]
 The caffeine is removed with the sugarcane EA (ethyl acetate) method. It is surprisingly sweet for a decaf, with notes of milk chocolate and red grape.
 
 Perfect for a relaxed evening after dinner, and just as good with milk as a café au lait.
-
-> Note: this bean, including its farm, lot, roaster and tasting notes, is fictional and was written for building this website.

@@ -10,5 +10,3 @@ flavor: ["Lychee", "Bergamot", "Passion fruit", "Cinnamon"]
 Tropical aromas of lychee and passion fruit meet the elegance of bergamot, with a cinnamon-like finish typical of anaerobic fermentation.
 
 Brew a little cooler, around 90°C, to protect the aroma, and enjoy how the cup changes as it cools.
-
-> Note: this bean, including its farm, lot, roaster and tasting notes, is fictional and was written for building this website.

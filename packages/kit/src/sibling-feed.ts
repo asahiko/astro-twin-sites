@@ -45,6 +45,7 @@ export function siblingFeedLoader(options: { source: string; feedPath?: string; 
       const parser = new XMLParser({ ignoreAttributes: true });
       for (const lang of LANGS) {
         const path = localize(lang, feedPath);
+        const where = /^https?:\/\//.test(source) ? new URL(path, source).href : join(source, path);
         try {
           const xml = await readFeed(source, path);
           const raw = parser.parse(xml)?.rss?.channel?.item ?? [];
@@ -57,9 +58,9 @@ export function siblingFeedLoader(options: { source: string; feedPath?: string; 
             });
             store.set({ id, data });
           }
-          logger.info(`${items.length} ${lang} headlines from ${source}${path}`);
+          logger.info(`${items.length} ${lang} headlines from ${where}`);
         } catch (err) {
-          logger.warn(`No ${lang} headlines from ${source}${path}: ${(err as Error).message}`);
+          logger.warn(`No ${lang} headlines from ${where}: ${(err as Error).message}`);
         }
       }
     },

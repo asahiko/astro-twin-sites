@@ -1,0 +1,20 @@
+---
+import { formatDate, localize, type Lang } from "@twin/kit/i18n";
+import { getBeans, type getNotes } from "../lib/content";
+import { label } from "../lib/labels";
+
+interface Props { lang: Lang; items: Awaited<ReturnType<typeof getNotes>>; showBeans?: boolean; detailed?: boolean }
+const { lang, items, showBeans = true, detailed = false } = Astro.props;
+const beanTitles = new Map((await getBeans(lang)).map((b) => [b.data.slug, b.data.title]));
+---
+<ul class="news-list note-list">
+  {items.map(({ data }) => (
+    <li data-category={data.kind}>
+      <time datetime={data.date.toISOString()}>{formatDate(data.date, lang)}</time>
+      <span class="chips"><span class={`chip chip-${data.kind}`}>{label(data.kind, lang)}</span></span>
+      <a href={localize(lang, `/notes/${data.slug}/`)}>{data.title}</a>
+      {detailed && <span class="note-summary">{data.summary}{data.author && <span class="muted"> — {data.author}</span>}</span>}
+      {showBeans && <span class="note-beans">{data.beans.map((s) => beanTitles.get(s) ?? s).join(" / ")}</span>}
+    </li>
+  ))}
+</ul>

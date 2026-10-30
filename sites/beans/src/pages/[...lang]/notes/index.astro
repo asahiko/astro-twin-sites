@@ -1,0 +1,20 @@
+---
+import { langPaths, type Lang } from "@twin/kit/i18n";
+import Base from "../../../layouts/Base.astro";
+import CategoryFilter from "../../../components/CategoryFilter.astro";
+import NoteList from "../../../components/NoteList.astro";
+import { getNotes } from "../../../lib/content";
+import { NOTE_KINDS, UI } from "../../../lib/labels";
+
+export const getStaticPaths = langPaths;
+const { lang } = Astro.props as { lang: Lang };
+const t = UI[lang];
+const items = await getNotes(lang);
+---
+<Base lang={lang} title={t.notes}>
+  <h1>{t.notes}</h1>
+  <p>{t.notesLead}</p>
+  <p class="notice">{t.notesFictional}</p>
+  <CategoryFilter lang={lang} codes={NOTE_KINDS} target="#notes" />
+  <div id="notes"><NoteList lang={lang} items={items} /></div>
+</Base>
