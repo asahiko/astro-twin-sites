@@ -1,5 +1,7 @@
 # astro-twin-sites
 
+English | [日本語](README.ja.md)
+
 Demo of bilingual twin Astro static sites that share headlines, with search, filtering, and CI/CD deploys to a rental server.
 
 ## Features
@@ -188,6 +190,7 @@ www/<site> -> ../deploy/<site>/current             the domain's document root
 scripts/rollback.sh brew            # list releases, marking the live one
 scripts/rollback.sh brew previous   # switch to the release before the live one
 scripts/rollback.sh brew 20261029T083439Z-03256b0
+DEPLOY_DIR=brew_preview scripts/rollback.sh brew previous   # the preview
 ```
 
 Both scripts connect to the `sakura` host alias from `~/.ssh/config`; override it with `DEPLOY_REMOTE`.
