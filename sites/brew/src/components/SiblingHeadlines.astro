@@ -1,5 +1,6 @@
 ---
-import { formatDate, localize, type Lang } from "@twin/kit/i18n";
+import { formatDate, langPath, type Lang } from "@twin/kit/i18n";
+import { siteHref } from "@twin/kit/sites";
 import { getSiblingNews } from "../lib/content";
 import { UI } from "../lib/labels";
 
@@ -7,7 +8,7 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = UI[lang];
 const items = await getSiblingNews(lang);
-const siblingHome = new URL(localize(lang, "/"), "https://beans.brew.asahiko.link").href;
+const siblingHome = siteHref("beans", langPath(lang, "/"));
 ---
 <section class="sibling" aria-labelledby="sibling-heading">
   <h2 id="sibling-heading">{t.siblingHeading}</h2>

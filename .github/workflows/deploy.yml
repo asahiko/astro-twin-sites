@@ -15,9 +15,41 @@ permissions:
 
 jobs:
   deploy:
+    name: deploy (${{ matrix.target }})
     runs-on: ubuntu-latest
+    # The same commit is built and deployed once per target, in parallel.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The production domains: default URLs (packages/kit/src/sites.ts), www/brew and www/beans.
+          - target: production
+          # Subdirectories of the server's initial domain, kept out of search engines. The
+          # origin comes from the PREVIEW_ORIGIN repository variable (https://<initial-domain>).
+          - target: preview
+            brew_dir: brew_preview
+            beans_dir: beans_preview
     steps:
       - uses: actions/checkout@v5
+
+      - name: Set site URLs
+        id: urls
+        if: matrix.target == 'preview'
+        env:
+          PREVIEW_ORIGIN: ${{ vars.PREVIEW_ORIGIN }}
+        run: |
+          origin=${PREVIEW_ORIGIN%/}
+          if [ -z "$origin" ]; then
+            # Still build, so the subdirectory build is checked; there is nowhere to deploy it.
+            echo "::warning::PREVIEW_ORIGIN is not set; building the preview without deploying it."
+            origin=https://preview.invalid
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo "BREW_URL=$origin/${{ matrix.brew_dir }}/"
+            echo "BEANS_URL=$origin/${{ matrix.beans_dir }}/"
+            echo "NOINDEX=1"
+          } >> "$GITHUB_ENV"
 
       - uses: actions/setup-node@v5
         with:
@@ -31,6 +63,7 @@ jobs:
 
       - name: Configure SSH
         id: ssh
+        if: steps.urls.outputs.skip != 'true'
         env:
           SAKURA_HOST: ${{ secrets.SAKURA_HOST }}
           SAKURA_USER: ${{ secrets.SAKURA_USER }}
@@ -59,20 +92,27 @@ jobs:
 
       - name: Deploy beans
         if: steps.ssh.outputs.ready == 'true'
+        env:
+          DEPLOY_DIR: ${{ matrix.beans_dir }}
         run: scripts/deploy.sh beans
 
       - name: Deploy brew
         if: steps.ssh.outputs.ready == 'true'
+        env:
+          DEPLOY_DIR: ${{ matrix.brew_dir }}
         run: scripts/deploy.sh brew
 
       - name: Smoke test
         if: steps.ssh.outputs.ready == 'true'
         run: |
-          # Each site's public URL is its `site` setting in astro.config.mjs.
+          # The same URLs the build used (packages/kit/src/sites.ts), ending in "/".
           for site in brew beans; do
-            base=$(sed -nE 's/^ *site: "([^"]+)".*/\1/p' "sites/$site/astro.config.mjs")
-            for url in "$base/" "$base/news/feed/"; do
+            base=$(node -e 'import("./packages/kit/src/sites.ts").then((m) => console.log(m.siteUrl(process.argv[1]).href))' "$site")
+            for url in "$base" "${base}news/feed/"; do
               curl -fsS -o /dev/null -w "%{http_code} %{content_type}  $url\n" "$url" \
                 || echo "::warning::$url did not respond with 2xx (DNS/SSL may not be set up yet)"
             done
+            if [ -n "$NOINDEX" ] && ! curl -fsSI "$base" | grep -qi '^x-robots-tag: *noindex'; then
+              echo "::warning::$base has no X-Robots-Tag: noindex header"
+            fi
           done

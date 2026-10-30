@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
-import { localize, otherLang, splitLangPath, type Lang } from "@twin/kit/i18n";
+import { langPath, localize, otherLang, splitLangPath, withBase, type Lang } from "@twin/kit/i18n";
+import { noindex, siteHref } from "@twin/kit/sites";
 import Logo from "../components/Logo.astro";
 import { UI } from "../lib/labels";
 
@@ -34,7 +35,8 @@ const current = (href: string) => (href === "/" ? rest === "/" : rest.startsWith
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description ?? t.tagline} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {noindex() && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href={withBase("/favicon.svg")} type="image/svg+xml" />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     {altPath && <link rel="alternate" hreflang={other} href={new URL(altPath, Astro.site)} />}
     <link rel="alternate" type="application/rss+xml" title={`${t.siteName} ${t.news}`} href={localize(lang, "/news/feed/")} />
@@ -64,7 +66,7 @@ const current = (href: string) => (href === "/" ? rest === "/" : rest.startsWith
         <ul class="footer-links">
           <li><a href={localize(lang, "/site-policy/")}>{t.policy}</a></li>
           <li><a href={localize(lang, "/news/feed/")}>RSS</a></li>
-          <li><a href={new URL(localize(lang, "/"), "https://brew.asahiko.link").href}>Brew Tsukuba</a></li>
+          <li><a href={siteHref("brew", langPath(lang, "/"))}>Brew Tsukuba</a></li>
         </ul>
         <p class="disclaimer">{t.disclaimer}</p>
         <p class="copyright">© {new Date().getFullYear()} BeanDaCs (demo)</p>

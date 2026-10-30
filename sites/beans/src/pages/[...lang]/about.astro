@@ -1,5 +1,6 @@
 ---
 import { langPaths, type Lang } from "@twin/kit/i18n";
+import { siteHref } from "@twin/kit/sites";
 import Base from "../../layouts/Base.astro";
 import { UI } from "../../lib/labels";
 
@@ -20,7 +21,7 @@ const { lang } = Astro.props as { lang: Lang };
         </ul>
         <p>絞り込みと並べ替えはすべてブラウザ上で行われ、サーバー側の検索処理はありません。</p>
         <h2>姉妹サイト</h2>
-        <p>つくばのカフェ情報サイト <a href="https://brew.asahiko.link/">Brew Tsukuba</a> のニュースを、ビルド時に RSS から取り込んでトップページに表示しています。</p>
+        <p>つくばのカフェ情報サイト <a href={siteHref("brew", "/")}>Brew Tsukuba</a> のニュースを、ビルド時に RSS から取り込んでトップページに表示しています。</p>
       </>
     ) : (
       <>
@@ -34,7 +35,7 @@ const { lang } = Astro.props as { lang: Lang };
         </ul>
         <p>Filtering and sorting run entirely in the browser; there is no server-side search.</p>
         <h2>Sister site</h2>
-        <p>The home page shows news from <a href="https://brew.asahiko.link/en/">Brew Tsukuba</a>, a café guide for Tsukuba, read from its RSS feed at build time.</p>
+        <p>The home page shows news from <a href={siteHref("brew", "/en/")}>Brew Tsukuba</a>, a café guide for Tsukuba, read from its RSS feed at build time.</p>
       </>
     )}
   </article>

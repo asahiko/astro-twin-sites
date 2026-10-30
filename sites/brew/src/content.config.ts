@@ -3,6 +3,7 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 import { PAIR_PATTERN, pairId } from "@twin/kit/pairs";
 import { siblingFeedLoader, siblingNewsSchema } from "@twin/kit/sibling-feed";
+import { siteHref } from "@twin/kit/sites";
 import { CAFE_CATEGORIES, NEWS_CATEGORIES } from "./lib/labels";
 
 // Metadata fields are optional here because English files may leave them out and inherit them
@@ -39,7 +40,7 @@ const cafes = defineCollection({
 });
 
 const siblingNews = defineCollection({
-  loader: siblingFeedLoader({ source: process.env.SIBLING_FEED_SOURCE ?? "https://beans.brew.asahiko.link/" }),
+  loader: siblingFeedLoader({ source: process.env.SIBLING_FEED_SOURCE ?? siteHref("beans", "/") }),
   schema: siblingNewsSchema,
 });
 

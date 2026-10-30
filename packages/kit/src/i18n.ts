@@ -16,14 +16,28 @@ export function otherLang(lang: Lang): Lang {
   return lang === "ja" ? "en" : "ja";
 }
 
+// The site's `base` without its trailing slash: "" at the root of a host, "/dir" in a subdirectory.
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 /** Prefix a site-relative path with the language segment ("/news/" -> "/en/news/"). */
-export function localize(lang: Lang, path: string): string {
+export function langPath(lang: Lang, path: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;
   return lang === DEFAULT_LANG ? p : `/${lang}${p}`;
 }
 
-/** Strip the language segment from a pathname, returning [lang, rest]. */
+/** Prefix a site-relative path with the site's `base` ("/favicon.svg" -> "/dir/favicon.svg"). */
+export function withBase(path: string): string {
+  return BASE + (path.startsWith("/") ? path : `/${path}`);
+}
+
+/** URL path of a page on this site, for links: `base` + language segment + path. */
+export function localize(lang: Lang, path: string): string {
+  return withBase(langPath(lang, path));
+}
+
+/** Split a URL pathname (with `base`) into its language and the site-relative rest. */
 export function splitLangPath(pathname: string): [Lang, string] {
+  if (BASE && (pathname === BASE || pathname.startsWith(`${BASE}/`))) pathname = pathname.slice(BASE.length) || "/";
   for (const lang of LANGS) {
     if (lang !== DEFAULT_LANG && (pathname === `/${lang}` || pathname.startsWith(`/${lang}/`))) {
       return [lang, pathname.slice(lang.length + 1) || "/"];

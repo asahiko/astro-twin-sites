@@ -147,13 +147,20 @@ The result is that both sites show each other's current news in a single run.
 
 ## Deploy
 
-`.github/workflows/deploy.yml` runs on every push to `main`, and on demand from the Actions tab:
+`.github/workflows/deploy.yml` runs on every push to `main`, and on demand from the Actions tab. A matrix runs the same steps for two targets in parallel:
 
-1. **Build.** `npm ci && npm run build`.
+| Target | URLs | Server directories |
+|---|---|---|
+| `production` | `https://<brew-domain>/`, `https://<beans-domain>/` | `www/brew`, `www/beans` |
+| `preview` | `<PREVIEW_ORIGIN>/brew_preview/`, `<PREVIEW_ORIGIN>/beans_preview/` | `www/brew_preview`, `www/beans_preview` |
+
+Each target goes through:
+
+1. **Build.** `npm ci && npm run build`, with the target's site URLs (see "Site URLs").
 2. **Deploy.** `scripts/deploy.sh beans`, then `scripts/deploy.sh brew`, over SSH with a dedicated key and a pinned host key.
-3. **Smoke-test.** `curl` both home pages and both feeds.
+3. **Smoke-test.** `curl` both home pages and both feeds. For the preview, also check for the `X-Robots-Tag: noindex` header.
 
-If the deploy secrets are not set, the workflow builds and then skips the deploy with a warning.
+The preview is the same commit served from subdirectories of the server's initial domain, and is kept out of search engines (`NOINDEX`). If the deploy secrets are not set, the workflow builds and then skips the deploy with a warning. The preview does the same when `PREVIEW_ORIGIN` is not set.
 
 ### Atomic releases
 
@@ -191,9 +198,27 @@ Placeholders used below:
 
 | Placeholder | Meaning |
 |---|---|
-| `<brew-domain>` / `<beans-domain>` | Public hostnames of the two sites. They are set as `site` in `sites/*/astro.config.mjs`, and as the sibling feed URL in `sites/*/src/content.config.ts`. |
+| `<brew-domain>` / `<beans-domain>` | Public hostnames of the two sites: the defaults in `packages/kit/src/sites.ts` (see "Site URLs"). |
 | `<server-host>` | SSH hostname of the rental server |
 | `<server-user>` | SSH user on the rental server, whose home directory holds `www/` |
+
+### Site URLs
+
+Each site's public URL is read at build time from `BREW_URL` / `BEANS_URL`, falling back to the production hosts in `packages/kit/src/sites.ts`. It sets Astro's `site`, the cross-site links, the sibling feed URL, `robots.txt`, and the smoke test.
+
+A URL may include a path. Building with
+
+```bash
+BREW_URL=https://<initial-domain>/brew_preview/ BEANS_URL=https://<initial-domain>/beans_preview/ npm run build
+```
+
+makes each site work from that subdirectory (Astro's `base`): every internal link, the Pagefind bundle and results, and `ErrorDocument` in `.htaccess` get the prefix. This lets a new build be checked on the server's initial domain before a real domain is pointed at it. Code that writes a root-relative URL has to go through `localize()` or `withBase()` from `packages/kit/src/i18n.ts`; a path written as a plain `"/..."` string breaks only in a subdirectory build, so check one before relying on it. Absolute links typed into Markdown content are not rewritten.
+
+To deploy such a build, also give each site its own directory on the server with `DEPLOY_DIR` (`DEPLOY_DIR=brew_preview scripts/deploy.sh brew`); otherwise it replaces the production docroot `www/brew`. The initial domain serves `www/<dir>` at `/<dir>/`, so the directory name must match the subdirectory in the URL. To switch a domain to a directory later, rebuild with the domain's URL (keeping the directory), then change the domain's document root in the control panel.
+
+`NOINDEX=1` marks a build as a preview: every page gets `<meta name="robots" content="noindex, nofollow">`, and `.htaccess` sends `X-Robots-Tag: noindex, nofollow` with every file, including feeds and the search index. A `robots.txt` cannot do this, since crawlers only read the one at the root of the host.
+
+The CI preview target sets all of these itself. It only needs the repository variable `PREVIEW_ORIGIN`: the server's initial domain, e.g. `https://<initial-domain>` (`gh variable set PREVIEW_ORIGIN`).
 
 The workflow reads these GitHub Actions secrets:
 

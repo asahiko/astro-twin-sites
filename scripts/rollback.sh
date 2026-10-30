@@ -4,12 +4,14 @@
 #   scripts/rollback.sh <brew|beans>             # list releases
 #   scripts/rollback.sh <brew|beans> <release>   # make <release> live
 #   scripts/rollback.sh <brew|beans> previous    # the release before the live one
+#
+# Env: DEPLOY_DIR  directory name on the server, if the deploy used one (default: the site name)
 set -euo pipefail
 site="${1:?usage: rollback.sh <brew|beans> [release|previous]}"
 target="${2:-}"
 remote="${DEPLOY_REMOTE:-sakura}"
 
-ssh "$remote" sh -s -- "$site" "$target" <<'REMOTE'
+ssh "$remote" sh -s -- "${DEPLOY_DIR:-$site}" "$target" <<'REMOTE'
 set -eu
 site=$1 target=${2:-}  # an empty argument does not survive ssh
 cd "$HOME/deploy/$site"

@@ -1,12 +1,14 @@
 ---
 // Pagefind's index exists only after `npm run build` (pagefind --site dist), so dev shows a notice.
-import { langPaths, type Lang } from "@twin/kit/i18n";
+import { langPaths, withBase, type Lang } from "@twin/kit/i18n";
 import Base from "../../layouts/Base.astro";
 import { UI } from "../../lib/labels";
 
 export const getStaticPaths = langPaths;
 const { lang } = Astro.props as { lang: Lang };
 const dev = import.meta.env.DEV;
+// Pagefind stores result URLs relative to dist/, so the UI needs `base` to link them.
+const baseUrl = withBase("/");
 ---
 <Base lang={lang} title={UI[lang].search}>
   <h1>{UI[lang].search}</h1>
@@ -14,11 +16,11 @@ const dev = import.meta.env.DEV;
     <p class="notice">Search works only on a production build: <code>npm run build && npm run preview</code>.</p>
   ) : (
     <>
-      <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+      <link href={withBase("/pagefind/pagefind-ui.css")} rel="stylesheet" />
       <div id="search" data-pagefind-ignore></div>
-      <script is:inline src="/pagefind/pagefind-ui.js"></script>
-      <script is:inline>
-        const ui = new PagefindUI({ element: "#search", showSubResults: true, resetStyles: false });
+      <script is:inline src={withBase("/pagefind/pagefind-ui.js")}></script>
+      <script is:inline define:vars={{ baseUrl }}>
+        const ui = new PagefindUI({ element: "#search", baseUrl, showSubResults: true, resetStyles: false });
         const q = new URLSearchParams(location.search).get("q");
         if (q) ui.triggerSearch(q);
       </script>
