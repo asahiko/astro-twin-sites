@@ -9,6 +9,7 @@ Demo of bilingual twin Astro static sites that share headlines, with search, fil
 - **CI/CD.** GitHub Actions builds both sites and deploys them over SSH to a Sakura rental server.
 - **Atomic releases with rollback.** Each deploy goes to a new release directory, and switching the live release is a single symlink swap.
 - **Full-text search.** [Pagefind](https://pagefind.app/) runs client-side, with separate Japanese and English indexes.
+- **Hierarchical content.** In the bean catalog, each bean (parent) carries child notes (cupping logs, recipes, reviews, user voices). The bean's page has a sidebar with one page per kind of note, and the finder can filter by which kinds a bean has. The parent–child links are resolved and checked at build time.
 - **Metadata filtering.** Lists can be narrowed by metadata such as category, origin, process, and roast, combined across facets. The filter state lives in the URL, so a filtered view can be shared as a link.
 - **Bilingual (日本語 / English).** Translations are paired per item. An item that exists only in Japanese is handled cleanly, and each page carries hreflang alternates.
 - **RSS feeds and sitemaps.** Each site has an RSS 2.0 feed per language and a sitemap.
@@ -112,7 +113,23 @@ sites/brew/src/content/news/2026/2026-10-01-some-topic/
 | `/news/` · `/news/<slug>/` · `/news/feed/` | News and RSS |
 | `/about/`, `/contact/`, `/site-policy/`, `/search/` | Static pages, Pagefind search |
 
-A note names its beans by slug in frontmatter (`beans: [red-ridge-nyeri]`), and the build fails if a slug does not exist. The finder's "beans with notes" facet is computed at build time and stored on each card, so it needs no runtime lookup.
+#### Beans and their notes
+
+The catalog is two levels deep: **beans** are the catalog entries, and **notes** hang off them.
+
+```
+bean   src/content/beans/<slug>/       →  /beans/<slug>/              (basic info)
+ └─ notes   src/content/notes/<slug>/  →  /beans/<slug>/cupping-log/  (one page per kind:
+                                          /beans/<slug>/recipe/        cupping-log, recipe,
+                                          /beans/<slug>/review/        review, voice)
+                                          /beans/<slug>/voice/
+                                       →  /notes/<slug>/              (each note)
+```
+
+- **Links point upward only.** The child points to its parent: a note names its beans by slug in frontmatter (`beans: [red-ridge-nyeri]`). Beans never list their notes, so adding a note touches one file.
+- **One note can belong to several beans.** A comparison cupping, for example. Its page shows the sidebar of the first bean it names, and lists the others below the text.
+- **Broken links fail the build.** The build stops if a slug does not exist.
+- **Everything else is derived at build time.** This covers the per-kind pages, the counts and greyed-out entries in the sidebar, the note count on each card, and the finder's "beans with notes" facet. That facet is stored on each card, so filtering by it needs no runtime lookup.
 
 Bean metadata lives in the Japanese file as codes, e.g. `type: blend`, `country: [ET, CO]`, `process: washed`. The finder runs entirely in the browser over `data-*` attributes on the pre-rendered cards. Within one facet, ticked values are combined with OR; across facets, with AND.
 
